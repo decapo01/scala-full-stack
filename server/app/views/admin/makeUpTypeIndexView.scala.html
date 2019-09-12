@@ -1,0 +1,47 @@
+@import com.thatjessicaiknow.shared.common.Repo.Page
+@import com.thatjessicaiknow.shared.makeup.Makeup.MakeupType
+
+@(makeUpTypePage: Page[MakeupType])
+
+@main("Admin Makeup Types"){
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <h2>Makeup Types</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupTypeController.getCreate()">Create New</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @makeUpTypePage.items.map { _type =>
+                <tr>
+                  <td>@_type.name</td>
+                  <td><a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupTypeController.getEdit(_type.id.value)">Edit</a></td>
+                  <td><a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupTypeController.getDelete(_type.id.value)">Delete</a></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+
+

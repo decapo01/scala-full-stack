@@ -1,0 +1,25 @@
+@import com.thatjessicaiknow.shared.accounts.Accounts.User
+@import helper._
+
+@(_form: Form[User])(implicit requestHeader: RequestHeader,messages: Messages)
+
+@main("Register"){
+
+  @_form.globalErrors.map { e =>
+
+    <li>@e.message</li>
+  }
+
+  @form(action = com.thatjessicaiknow.server.controllers.routes.Application.postRegister){
+
+    @CSRF.formField
+
+    <input type="hidden" name="id.value" value="@_form.data("id.value")" />
+
+    @inputText(_form("email"))
+
+    @inputText(_form("password"))
+
+    <input type="submit" />
+  }
+}

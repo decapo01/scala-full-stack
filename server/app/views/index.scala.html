@@ -1,0 +1,22 @@
+@(message: String,user:  com.thatjessicaiknow.shared.accounts.Accounts.User)
+
+@main("Play with Scala.js") {
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <h1>Hello from scala and scala.js</h1>
+        <h2>Play and Scala.js share a same message</h2>
+        <ul>
+          <li>Play shouts out: <em>@message</em></li>
+          <li>Scala.js shouts out: <em id="scalajsShoutOut"></em></li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div id="app"></div>
+      </div>
+    </div>
+  </div>
+}

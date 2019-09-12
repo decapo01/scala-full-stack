@@ -1,0 +1,49 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET   /         com.thatjessicaiknow.server.controllers.Application.index
+
+GET   /register com.thatjessicaiknow.server.controllers.Application.getRegister
+POST  /register com.thatjessicaiknow.server.controllers.Application.postRegister
+
+GET   /login    com.thatjessicaiknow.server.controllers.Application.getLogin
+POST  /login    com.thatjessicaiknow.server.controllers.Application.postLogin
+
+
+# GET   /makeup  ???
+# GET   /makeup-categories
+# GET   /skin-products
+# GET   /haircare
+
+GET   /admin  com.thatjessicaiknow.server.controllers.AdminController.index
+
+GET   /admin/makeup-types com.thatjessicaiknow.server.controllers.admin.AdminMakeupTypeController.index
+GET   /admin/makeup-types/create com.thatjessicaiknow.server.controllers.admin.AdminMakeupTypeController.getCreate
+POST  /admin/makeup-types/create com.thatjessicaiknow.server.controllers.admin.AdminMakeupTypeController.postCreate
+GET   /admin/makeup-types/:id com.thatjessicaiknow.server.controllers.admin.AdminMakeupTypeController.getEdit(id: java.util.UUID)
+POST  /admin/makeup-types/:id com.thatjessicaiknow.server.controllers.admin.AdminMakeupTypeController.postEdit(id: java.util.UUID)
+GET   /admin/makeup-types/delete/:id com.thatjessicaiknow.server.controllers.admin.AdminMakeupTypeController.getDelete(id: java.util.UUID)
+POST  /admin/makeup-types/delete/:id com.thatjessicaiknow.server.controllers.admin.AdminMakeupTypeController.postDelete(id: java.util.UUID)
+
+
+
+
+# GET    /api/v1/makeup
+# POST   /api/v1/makeup
+# PUT    /api/v1/makeup/:id
+# DELETE /api/v1/makeup/:id
+
+# GET   /api/v1/makeup-categories
+# GET   /api/v1/skin-products
+# GET   /api/v1/haircare
+
+
+GET   /api/v1/customers   com.thatjessicaiknow.server.controllers.api.v1.CompanyApiV1Controller.index
+
+
+
+# Prefix must match `play.assets.urlPrefix`
+GET        /assets/*file                 controllers.Assets.at(file)
+GET        /versionedAssets/*file        controllers.Assets.versioned(path="/public", file: Asset)
