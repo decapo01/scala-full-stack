@@ -1,6 +1,11 @@
 @(message: String,user:  com.thatjessicaiknow.shared.accounts.Accounts.User)
 
-@main("Play with Scala.js") {
+@scripts = {
+
+  @scalajs.html.scripts("client", routes.Assets.versioned(_).toString, name => getClass.getResource(s"/public/$name") != null)
+}
+
+@main("Play with Scala.js",extraScripts = Some(scripts)) {
 
   <div class="container">
     <div class="row">

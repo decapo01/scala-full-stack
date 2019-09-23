@@ -3,7 +3,7 @@ package com.thatjessicaiknow.server.repo
 import java.util.UUID
 
 import com.thatjessicaiknow.server.common.AbstractSlickRepo
-import com.thatjessicaiknow.shared.makeup.Makeup._
+import com.thatjessicaiknow.shared.makeup.Makeups._
 import javax.inject.Inject
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile

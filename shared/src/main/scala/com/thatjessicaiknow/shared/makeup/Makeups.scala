@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.thatjessicaiknow.shared.common.Repo._
 
-object Makeup {
+object Makeups {
 
 
   final case class MakeupTypeId(value: UUID) extends Id[UUID]
@@ -32,6 +32,18 @@ object Makeup {
   final case object MakeupTypeNameDesc   extends MakeupTypeSort
   
   
+  def mapTypeSort(sortStr: String): MakeupTypeSort = {
+    
+    sortStr match {
+      case s: String if s == "idAsc"    => MakeupTypeIdAsc
+      case s: String if s == "idDesc"   => MakeupTypeIdAsc
+      case s: String if s == "nameAsc"  => MakeupTypeNameAsc
+      case s: String if s == "nameDesc" => MakeupTypeNameDesc
+      case _                            => MakeupTypeIdAsc
+    }
+  }
+  
+  
   trait MakeupTypeRepo extends Repo[MakeupTypeId,MakeupType,MakeupTypeCriteria[_],MakeupTypeSort]
   
   
@@ -40,6 +52,7 @@ object Makeup {
   final case class Makeup(
   
     id          : MakeupId,
+    typeId      : MakeupTypeId,
     name        : String,
     description : Option[String],
     rank        : Option[Int],

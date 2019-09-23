@@ -42,7 +42,7 @@ object CrmRepo {
     }
 
 
-    def createCustomerSort(item: CustomerTable, sort: CustomerSort): lifted.Ordered = {
+    def buildSort(item: CustomerTable, sort: CustomerSort): lifted.Ordered = {
 
       sort match {
         case CustomerIdAsc    => item.id.asc
@@ -105,7 +105,7 @@ object CrmRepo {
       }
     }
 
-    def createContactSort(contacts: ContactTable, sort: ContactSort): slick.lifted.Ordered = {
+    def buildSort(contacts: ContactTable, sort: ContactSort): slick.lifted.Ordered = {
 
        sort match {
          case ContactIdAsc  => contacts.id.asc

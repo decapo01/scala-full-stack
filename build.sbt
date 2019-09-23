@@ -3,7 +3,7 @@ import sbtcrossproject.{crossProject, CrossType}
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
 lazy val server = (project in file("server")).settings(commonSettings).settings(
-  scalaJSProjects := Seq(client),
+  scalaJSProjects := Seq(client,mformapp),
   pipelineStages in Assets := Seq(scalaJSPipeline),
   pipelineStages := Seq(digest, gzip),
   // triggers scalaJSPipeline when using compile or continuous compilation
@@ -16,8 +16,9 @@ lazy val server = (project in file("server")).settings(commonSettings).settings(
     "com.h2database" % "h2" % "1.4.192",
     "com.adrianhurt" %% "play-bootstrap" % "1.5.1-P26-B3",
     "org.webjars" %% "webjars-play" % "2.6.3",
-    "org.webjars" % "bootstrap" % "3.1.1-2",
+    "org.webjars" % "bootstrap" % "3.3.5",
     "org.webjars" % "jquery" % "3.4.1",
+    "org.webjars" % "bootstrap-select" % "1.13.8",
     "org.mindrot" % "jbcrypt" % "0.4",
     specs2 % Test
   ),
@@ -29,11 +30,20 @@ lazy val server = (project in file("server")).settings(commonSettings).settings(
 lazy val commonJs = (project in file("commonjs")).settings(commonSettings).settings(
   libraryDependencies ++= Seq(
     "org.scala-js" %%% "scalajs-dom" % "0.9.5",
-    "com.typesafe.play" %%% "play-json" % "2.6.0"
+    "com.typesafe.play" %%% "play-json" % "2.6.0",
+    "org.querki" %%% "jquery-facade" % "1.2",
+    "com.github.karasiq" %%% "scalajs-bootstrap" % "2.3.5"
   )
 )
 .enablePlugins(ScalaJSPlugin,ScalaJSWeb)
 .dependsOn(sharedJs)
+  
+  
+lazy val mformapp = (project in file("mformapp")).settings(commonSettings).settings(
+  scalaJSUseMainModuleInitializer := true,
+)
+.enablePlugins(ScalaJSPlugin,ScalaJSWeb)
+.dependsOn(sharedJs,commonJs)
 
 lazy val client = (project in file("client")).settings(commonSettings).settings(
   scalaJSUseMainModuleInitializer := true,

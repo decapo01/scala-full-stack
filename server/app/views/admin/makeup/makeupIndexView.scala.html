@@ -1,0 +1,45 @@
+@import com.thatjessicaiknow.shared.common.Repo.Page
+@import com.thatjessicaiknow.shared.makeup.Makeups.{Makeup,MakeupType}
+@import com.thatjessicaiknow.server.common.SortBy
+
+@(_page: Page[(Makeup,MakeupType)])
+
+@main("Makeup"){
+
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-lg-12">
+        <h1>Makeup</h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.getCreate()">Create New</a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Rank</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+}

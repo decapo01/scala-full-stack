@@ -48,7 +48,7 @@ with    Repo[ID,ENTITY,CRITERIA,SORT]{
 
   def findPage(criterion: Seq[CRITERIA] = Seq(),limit: Int = 10,page: Int = 1,sort: SORT): Future[Page[ENTITY]] = {
 
-      val itemsFut = db.run(findAllQuery(criterion).drop(limit * (page - 1)).take(limit).result)
+      val itemsFut = db.run(findAllQuery(criterion).sortBy(i => buildSort(i,sort)).drop(limit * (page - 1)).take(limit).result)
       val totalFut = db.run(findAllQuery(criterion).length.result)
 
       for {
@@ -62,6 +62,8 @@ with    Repo[ID,ENTITY,CRITERIA,SORT]{
   }
 
   def buildQuery(item: TableType, criterion: CRITERIA): Rep[Boolean]
+  
+  def buildSort(item: TableType, sort: SORT): slick.lifted.Ordered
 
 
   //def pkType: BaseTypedType[ID]

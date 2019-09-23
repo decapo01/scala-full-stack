@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String,extraScripts: Option[Html] = None,extraCss: Option[Html] = None)(content: Html)
 
 <!DOCTYPE html>
 
@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css")">
     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+    @extraCss.getOrElse({})
     <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
   </head>
   <body>
@@ -17,5 +18,6 @@
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/bootstrap/js/bootstrap.min.js")"></script>
     @*scalajs.html.scripts("client", routes.Assets.versioned(_).toString, name => getClass.getResource(s"/public/$name") != null)*@
+    @extraScripts.getOrElse({})
   </body>
 </html>

@@ -1,0 +1,24 @@
+@(field: Field,options: Seq[(String,String)], labelOpt: Option[String] = None)(implicit requestHeader: RequestHeader, messages: Messages)
+
+<div class="form-group @if(field.hasErrors){ has-error }">
+
+  @labelOpt.map { label =>
+    <label class="control-label">@label</label>
+  }
+  <select id="@field.id" name="@field.name" class="form-control selectpicker" data-live-search="true">
+  @options.map { option =>
+    @field.value match {
+
+      case Some(v) if v == option._1 => {
+        <option value="@option._1" selected>@option._2</option>
+      }
+      case _ => {
+        <option value="@option._1">@option._2</option>
+      }
+    }
+  }
+  </select>
+  @field.errors.map { error =>
+    <span class="help-block">@error.format</span>
+  }
+</div>

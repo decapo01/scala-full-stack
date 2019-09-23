@@ -1,34 +1,41 @@
 @import com.thatjessicaiknow.shared.common.Repo.Page
-@import com.thatjessicaiknow.shared.makeup.Makeup.MakeupType
+@import com.thatjessicaiknow.shared.makeup.Makeups.MakeupType
+@import views.html.common.pageLink
+@import views.html.common.sortBy
+@import views.html.common.sortIcon
 
-@(makeUpTypePage: Page[MakeupType])
+@import com.thatjessicaiknow.server.common.SortBy
+@(_page: Page[MakeupType])(implicit req: Request[_])
 
 @main("Admin Makeup Types"){
 
   <div class="container-fluid">
+
     <div class="row">
       <div class="col-lg-12">
         <h2>Makeup Types</h2>
       </div>
     </div>
+
     <div class="row">
       <div class="col-lg-12">
         <a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupTypeController.getCreate()">Create New</a>
       </div>
     </div>
+
     <div class="row">
       <div class="col-lg-12">
         <div class="table-responsive">
           <table class="table table-bordered">
             <thead>
               <tr>
-                <th>Name</th>
+                <th><a href="?@SortBy(req,"nameAsc","nameDesc")">Name @sortIcon(req,"nameAsc","nameDesc")</a></th>
                 <th></th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              @makeUpTypePage.items.map { _type =>
+              @_page.items.map { _type =>
                 <tr>
                   <td>@_type.name</td>
                   <td><a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupTypeController.getEdit(_type.id.value)">Edit</a></td>
@@ -40,6 +47,21 @@
         </div>
       </div>
     </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="pull-right">
+          <ul class="pagination">
+            <li><a href="?@pageLink(req,1)">first</a></li>
+            <li><a href="?@pageLink(req,_page.previousPage)">prev</a></li>
+            <li class="disabled"><a>@_page.page</a></li>
+            <li><a href="?@pageLink(req,_page.nextPage)">next</a></li>
+            <li><a href="?@pageLink(req,_page.totalPages)">last</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
   </div>
 }
 

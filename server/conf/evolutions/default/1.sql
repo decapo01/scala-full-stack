@@ -57,8 +57,8 @@ create table makeup_types (
 
 create table makeups (
 
-  id uuid primary key not null,
-
+  id      uuid primary key not null,
+  type_id uuid references makeup_types(id),
   name        varchar(255) not null,
   description varchar(255)     null,
   rank        int              null

@@ -30,7 +30,18 @@ object Repo {
     total: Int,
     limit: Int,
     page: Int
-  )
+  ){
+  
+    def totalPages =
+      if(limit == 0)
+        1
+      else
+        Math.ceil(total.toDouble/limit.toDouble).toInt
+  
+    def previousPage = if(page == 1) 1 else page - 1
+    
+    def nextPage = if(page == totalPages) totalPages else page + 1
+  }
 
   trait Repo[ID <: Id[_], ENTITY <: Entity[ID], CRITERIA <: Criteria[_], SORT <: Sort] {
 

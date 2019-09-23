@@ -39,10 +39,10 @@ object LoginAttemptRepo {
       }
     }
     
-    def buildSort(item: LoginAttemptTable,sort: BlockedIpSort): slick.lifted.Ordered = {
+    def buildSort(item: LoginAttemptTable,sort: LoginAttemptSort): slick.lifted.Ordered = {
       
       sort match {
-        case BlockedIpIdAsc => item.id.asc
+        case LoginAttemptIdAsc => item.id.asc
       }
     }
   }

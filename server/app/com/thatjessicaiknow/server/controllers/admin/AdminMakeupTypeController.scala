@@ -6,7 +6,7 @@ import javax.inject.Inject
 import com.thatjessicaiknow.server.actions.Authentication.{AuthenticationAction, AuthorizationAction}
 import com.thatjessicaiknow.server.providers.UUIDProvider
 import com.thatjessicaiknow.shared.accounts.Accounts.{AdminRole, UserRole}
-import com.thatjessicaiknow.shared.makeup.Makeup._
+import com.thatjessicaiknow.shared.makeup.Makeups._
 import play.api.data.Form
 import play.api.data.Forms.{mapping, nonEmptyText, uuid}
 import play.api.i18n.I18nSupport
@@ -43,9 +43,14 @@ class AdminMakeupTypeController @Inject()(
   
   val deleteRoute = (id: UUID) => com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupTypeController.postDelete(id)
   
-  def index = (authenticationAction andThen AuthorizationAction(AdminRole)).async { implicit req =>
+  def index(page: Option[Int] = None,sort: Option[String] = None) = (authenticationAction andThen AuthorizationAction(AdminRole)).async { implicit req =>
+    
+    val _sort = sort.map(mapTypeSort(_)).getOrElse(MakeupTypeIdAsc)
+    
+    val _page = page.getOrElse(1)
+    
     for {
-      makeupTypePage <- makeupTypeRepo.findPage(sort = MakeupTypeIdAsc)
+      makeupTypePage <- makeupTypeRepo.findPage(sort = _sort, page = _page)
     }
     yield {
       Ok(indexView(makeupTypePage))

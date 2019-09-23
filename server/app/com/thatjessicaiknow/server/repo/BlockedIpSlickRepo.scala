@@ -35,6 +35,14 @@ trait BlockedIpComponent extends DateTimeMapper { self : HasDatabaseConfigProvid
       case BlockedIpIpEq(ip) => item.ip === ip
     }
   }
+  
+  def buildSort(item: BlockedIpTable,sort: BlockedIpSort): slick.lifted.Ordered = {
+  
+    sort match {
+  
+      case BlockedIpIdAsc => item.id.asc
+    }
+  }
 }
 
 
