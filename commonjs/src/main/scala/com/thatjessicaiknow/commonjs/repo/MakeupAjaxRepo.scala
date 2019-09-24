@@ -16,7 +16,7 @@ class MakeupAjaxRepo (implicit ec: ExecutionContext){
   
   def findByType(typeId: String): Future[Seq[Makeup]] = {
   
-    Ajax.get("").map { xhr =>
+    Ajax.get(s"/api/v1/admin/makeup?typeid=${typeId}").map { xhr =>
     
       val json = Json.parse(xhr.responseText)
       

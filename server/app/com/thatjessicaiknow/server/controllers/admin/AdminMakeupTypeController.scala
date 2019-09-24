@@ -43,9 +43,14 @@ class AdminMakeupTypeController @Inject()(
   
   val deleteRoute = (id: UUID) => com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupTypeController.postDelete(id)
   
-  def index(page: Option[Int] = None,sort: Option[String] = None) = (authenticationAction andThen AuthorizationAction(AdminRole)).async { implicit req =>
+  def index(page: Option[Int] = None,sort: Option[String] = None,order: Option[String] = None) = (authenticationAction andThen AuthorizationAction(AdminRole)).async { implicit req =>
     
-    val _sort = sort.map(mapTypeSort(_)).getOrElse(MakeupTypeIdAsc)
+    val _sort = (sort,order) match {
+  
+      case (Some(s),Some(o)) => mapTypeSort(s,o)
+
+      case _ => MakeupTypeNameAsc
+    }
     
     val _page = page.getOrElse(1)
     

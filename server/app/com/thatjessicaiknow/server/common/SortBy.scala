@@ -5,21 +5,27 @@ import play.api.mvc.Request
 object SortBy {
 
 
-  def apply(req: Request[_],sortAsc: String, sortDesc: String): String = {
+  def apply(req: Request[_],sort: String): String = {
   
-    req.getQueryString("sort") match {
-    
-      case None => req.rawQueryString + "sort=" + sortAsc
-    
-      case Some(s) => {
+    (req.getQueryString("sort"),req.getQueryString("order")) match {
       
-        val sortItem = if(s == sortAsc) sortDesc else sortAsc
+      case (Some(s),Some(o)) if s == sort => {
+        
+        val orderItem = if(o == "asc") "desc" else "asc"
       
-        (req.queryString + ("sort" -> Seq(sortItem))).map {
+        (req.queryString + ("sort" -> Seq(s)) + ("order" -> Seq(orderItem))).map {
           case (k,v) => s"$k=${v.head}"
         
         }.reduce((a,b) => s"$a&$b")
       }
+
+      case _ =>
+        req
+        .queryString
+        .filter{ case (k,v) => k != "sort" }
+        .filter{ case (k,v) => k != "order"}
+        .map   { case (k,v) => k + "=" + v.head }
+        .foldLeft("")(_ + "&" + _) + "sort=" + sort + "&order=asc"
     }
   }
   

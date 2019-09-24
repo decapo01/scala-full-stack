@@ -1,10 +1,15 @@
-@(req: Request[_],sortAsc: String,sortDesc: String)
+@(req: Request[_],sort: String)
 
-@{req.getQueryString("sort") match {
+@{(req.getQueryString("sort"), req.getQueryString("order")) match {
 
-    case None => {}
+    case (Some(s),Some(o)) if s == sort => {
+      if(o == "asc")
+        <span class="glyphicon glyphicon-triangle-bottom"></span>
+      else
+        <span class="glyphicon glyphicon-triangle-top"></span>
+    }
 
-    case Some(s) => { if(s == sortAsc) <span class="glyphicon glyphicon-triangle-bottom"></span> else <span class="glyphicon glyphicon-triangle-top"></span>}
+    case _ => {}
   }
 }
 

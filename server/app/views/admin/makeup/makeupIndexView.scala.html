@@ -1,8 +1,9 @@
 @import com.thatjessicaiknow.shared.common.Repo.Page
 @import com.thatjessicaiknow.shared.makeup.Makeups.{Makeup,MakeupType}
 @import com.thatjessicaiknow.server.common.SortBy
+@import views.html.common.sortIcon
 
-@(_page: Page[(Makeup,MakeupType)])
+@(_page: Page[(Makeup,MakeupType)])(implicit req: Request[_])
 
 @main("Makeup"){
 
@@ -26,16 +27,25 @@
           <table class="table table-bordered">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Rank</th>
+                <th><a href="?@SortBy(req,"name")">       Name @sortIcon(req,"name") </a></th>
+                <th><a href="?@SortBy(req,"type")">       Type @sortIcon(req,"type") </a></th>
+                <th><a href="?@SortBy(req,"description")">Description @sortIcon(req,"description")</a></th>
+                <th><a href="?@SortBy(req,"rank")">       Rank @sortIcon(req,"rank") </a></th>
                 <th></th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-
+              @_page.items.map { case (makeup, _type) =>
+                <tr>
+                  <td>@makeup.name</td>
+                  <td>@_type.name</td>
+                  <td>@makeup.description.getOrElse("")</td>
+                  <td>@makeup.rank.getOrElse("")</td>
+                  <td><a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.getUpdate(makeup.id.value)">Update</a></td>
+                  <td><a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.getDelete(makeup.id.value)">Delete</a></td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>

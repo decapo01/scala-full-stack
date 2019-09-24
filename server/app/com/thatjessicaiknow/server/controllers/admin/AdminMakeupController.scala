@@ -43,6 +43,10 @@ class AdminMakeupController @Inject()(
     )(Makeup.apply)(Makeup.unapply)
   )
   
+  def indexRoute = com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.index()
+  
+  def createRoute = com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.postCreate()
+  
   def index = (authAction andThen AuthorizationAction(AdminRole)).async { implicit req =>
   
     for {
@@ -73,11 +77,42 @@ class AdminMakeupController @Inject()(
   
     val action = com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.postCreate
     
-    val _form = form.fill(defaultMakeup)
-    
-    Future.successful{
-      Ok(formView(_form,Create(action)))
-    }
+    form.bindFromRequest().fold(
+      formWithErrors => {
+        for {
+          makeupTypes <- makeupTypeRepo.findAll()
+        }
+        yield {
+          val types = makeupTypes.map(t => (t.id.value.toString,t.name))
+  
+          BadRequest(formView(formWithErrors,Create(createRoute),types))
+        }
+      },
+      makeup => {
+        for {
+          maybeMakeup <- makeupRepo.findByCriteria(Seq(MakeupNameEq(makeup.name)))
+          res <-
+            maybeMakeup match {
+              case Some(_) =>
+                val _form = form.fill(makeup).withGlobalError("msg","Makeup with name currently exists")
+  
+                for {
+                  makeupTypes <- makeupTypeRepo.findAll()
+                }
+                yield {
+                  val types = makeupTypes.map(t => (t.id.value.toString,t.name))
+                  
+                  BadRequest(formView(_form,Create(createRoute),types))
+                }
+              case None =>
+                makeupRepo.insert(makeup).map { _ => Redirect(indexRoute) }
+            }
+        }
+        yield {
+          res
+        }
+      }
+    )
   }
   
   def getUpdate(id: UUID) = (authAction andThen AuthorizationAction(AdminRole)).async { implicit req =>

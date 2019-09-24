@@ -48,9 +48,11 @@ object MakeupRepo {
     
       criteria match {
   
-        case Makeups.MakeupIdEq(value) => item.id === value
-        case Makeups.MakeupIdNotEq(value) => item.id =!= value
-        case Makeups.Search(value)        => item.name.like(value.toLowerCase()) || item.description.like(value).getOrElse(false)
+        case Makeups.MakeupIdEq(value)           => item.id === value
+        case Makeups.MakeupIdNotEq(value)        => item.id =!= value
+        case Makeups.MakeupMakeupTypeIdEq(value) => item.typeId === value
+        case Makeups.MakeupNameEq(value)         => item.name   === value
+        case Makeups.Search(value)               => item.name.like(value.toLowerCase()) || item.description.like(value).getOrElse(false)
       }
     }
     

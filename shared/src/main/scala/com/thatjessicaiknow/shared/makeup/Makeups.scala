@@ -32,13 +32,13 @@ object Makeups {
   final case object MakeupTypeNameDesc   extends MakeupTypeSort
   
   
-  def mapTypeSort(sortStr: String): MakeupTypeSort = {
+  def mapTypeSort(sortStr: String,order: String): MakeupTypeSort = {
     
-    sortStr match {
-      case s: String if s == "idAsc"    => MakeupTypeIdAsc
-      case s: String if s == "idDesc"   => MakeupTypeIdAsc
-      case s: String if s == "nameAsc"  => MakeupTypeNameAsc
-      case s: String if s == "nameDesc" => MakeupTypeNameDesc
+    (sortStr,order) match {
+      case (s: String, o: String) if s == "id"   && o == "asc"  => MakeupTypeIdAsc
+      case (s: String, o: String) if s == "id"   && o == "desc" => MakeupTypeIdAsc
+      case (s: String, o: String) if s == "name" && o == "asc"  => MakeupTypeNameAsc
+      case (s: String, o: String) if s == "name" && o == "desc" => MakeupTypeNameDesc
       case _                            => MakeupTypeIdAsc
     }
   }
@@ -62,8 +62,10 @@ object Makeups {
   
   sealed trait MakeupCriteria[A] extends Criteria[A]
   
-  final case class MakeupIdEq(value: MakeupId) extends MakeupCriteria[MakeupId]
+  final case class MakeupIdEq(value: MakeupId)    extends MakeupCriteria[MakeupId]
   final case class MakeupIdNotEq(value: MakeupId) extends MakeupCriteria[MakeupId]
+  final case class MakeupNameEq(value: String)    extends MakeupCriteria[String]
+  final case class MakeupMakeupTypeIdEq(value: MakeupTypeId) extends MakeupCriteria[MakeupTypeId]
   final case class Search(value: String) extends MakeupCriteria[String]
   
   
