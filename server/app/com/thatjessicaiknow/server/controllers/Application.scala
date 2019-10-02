@@ -10,6 +10,8 @@ import javax.inject._
 import com.thatjessicaiknow.shared.shared.SharedMessages
 import com.thatjessicaiknow.server.repo.UserRepos
 import com.thatjessicaiknow.server.controllers.routes.Application
+import com.thatjessicaiknow.server.repo.MakeupRepo.MakeupViewRepo
+import com.thatjessicaiknow.shared.makeup.Makeups.MakeupTypeRepo
 import play.api.mvc._
 import play.api.data.Forms._
 import play.api.data._
@@ -29,6 +31,8 @@ final case class LoginData(
 class Application @Inject()(userRepo         : UserRepo,
                             loginAttemptRepo : LoginAttemptRepo,
                             blockedIpRepo    : BlockedIpRepo,
+                            makeupViewRepo   : MakeupViewRepo,
+                            makeupTypeRepo    : MakeupTypeRepo,
                             uuidProvider     : UUIDProvider,
                             dateTimeProvider : DateTimeProvider,
                             cc               : ControllerComponents,
@@ -54,13 +58,20 @@ class Application @Inject()(userRepo         : UserRepo,
     )(LoginData.apply)(LoginData.unapply)
   )
 
-  def index() = Action {
-
-    val x = null  // compiles :-(
-
-    val user = User(UserId(UUID.randomUUID()),"email@email.com","password")
-
-    Ok(views.html.index(SharedMessages.itWorks,user))
+  def index() = Action.async { implicit req =>
+  
+    for {
+      makeupViews <- makeupViewRepo.findPage()
+      makeupTypes <- makeupTypeRepo.findAll()
+    }
+    yield {
+  
+      val x = null  // compiles :-(
+  
+      val user = User(UserId(UUID.randomUUID()),"email@email.com","password")
+    
+      Ok(views.html.index(SharedMessages.itWorks,user,makeupViews,makeupTypes))
+    }
   }
 
   def getRegister = Action { implicit req: Request[_] =>

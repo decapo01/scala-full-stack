@@ -38,7 +38,7 @@ class AdminMakeupRestController @Inject()(
     val criteria: Seq[MakeupCriteria[_]] = Seq(typeIdCriteriaOpt).filter(_.isDefined).map(_.get)
   
     for {
-      makeups <- makeupRepo.findAll(criteria)
+      makeups <- makeupRepo.findAll(criteria = criteria,sortOpt = Some(RankAsc))
     }
     yield {
       Ok(Json.toJson(makeups))

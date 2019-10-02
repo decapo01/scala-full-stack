@@ -56,6 +56,7 @@ object Makeups {
     name        : String,
     description : Option[String],
     rank        : Option[Int],
+    link        : Option[String]
     
   ) extends Entity[MakeupId]
   
@@ -66,7 +67,8 @@ object Makeups {
   final case class MakeupIdNotEq(value: MakeupId) extends MakeupCriteria[MakeupId]
   final case class MakeupNameEq(value: String)    extends MakeupCriteria[String]
   final case class MakeupMakeupTypeIdEq(value: MakeupTypeId) extends MakeupCriteria[MakeupTypeId]
-  final case class Search(value: String) extends MakeupCriteria[String]
+  final case class Search(value: String)            extends MakeupCriteria[String]
+  final case class MakeupRankEq(value: Option[Int]) extends MakeupCriteria[Option[Int]]
   
   
   sealed trait MakeupSort extends Sort

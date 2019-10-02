@@ -3,7 +3,7 @@ import sbtcrossproject.{crossProject, CrossType}
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
 lazy val server = (project in file("server")).settings(commonSettings).settings(
-  scalaJSProjects := Seq(client,mformapp),
+  scalaJSProjects := Seq(client,mformapp,homeapp),
   pipelineStages in Assets := Seq(scalaJSPipeline),
   pipelineStages := Seq(digest, gzip),
   // triggers scalaJSPipeline when using compile or continuous compilation
@@ -32,7 +32,8 @@ lazy val commonJs = (project in file("commonjs")).settings(commonSettings).setti
     "org.scala-js" %%% "scalajs-dom" % "0.9.5",
     "com.typesafe.play" %%% "play-json" % "2.6.0",
     "org.querki" %%% "jquery-facade" % "1.2",
-    "com.github.karasiq" %%% "scalajs-bootstrap" % "2.3.5"
+    "com.github.karasiq" %%% "scalajs-bootstrap" % "2.3.5",
+    "com.lihaoyi" %%% "scalatags" % "0.7.0",
   )
 )
 .enablePlugins(ScalaJSPlugin,ScalaJSWeb)
@@ -40,6 +41,12 @@ lazy val commonJs = (project in file("commonjs")).settings(commonSettings).setti
   
   
 lazy val mformapp = (project in file("mformapp")).settings(commonSettings).settings(
+  scalaJSUseMainModuleInitializer := true,
+)
+.enablePlugins(ScalaJSPlugin,ScalaJSWeb)
+.dependsOn(sharedJs,commonJs)
+
+lazy val homeapp = (project in file("homeapp")).settings(commonSettings).settings(
   scalaJSUseMainModuleInitializer := true,
 )
 .enablePlugins(ScalaJSPlugin,ScalaJSWeb)

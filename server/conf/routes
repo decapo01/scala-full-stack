@@ -28,7 +28,7 @@ GET   /admin/makeup-types/delete/:id com.thatjessicaiknow.server.controllers.adm
 POST  /admin/makeup-types/delete/:id com.thatjessicaiknow.server.controllers.admin.AdminMakeupTypeController.postDelete(id: java.util.UUID)
 
 
-GET   /admin/makeup                 com.thatjessicaiknow.server.controllers.admin.AdminMakeupController.index
+GET   /admin/makeup                 com.thatjessicaiknow.server.controllers.admin.AdminMakeupController.index(page: Option[Int] ?= None, limit: Option[Int] ?= None, sort: Option[String] ?= None, order: Option[String] ?= None)
 GET   /admin/makeup/create          com.thatjessicaiknow.server.controllers.admin.AdminMakeupController.getCreate
 POST  /admin/makeup/create          com.thatjessicaiknow.server.controllers.admin.AdminMakeupController.postCreate
 GET   /admin/makeup/:id             com.thatjessicaiknow.server.controllers.admin.AdminMakeupController.getUpdate(id: java.util.UUID)

@@ -1,0 +1,13 @@
+@import com.thatjessicaiknow.shared.common.Repo.Page
+@import com.thatjessicaiknow.shared.makeup.Makeups.MakeupType
+@import com.thatjessicaiknow.shared.makeup.Makeups.Makeup
+
+@(makeupViewItems: Page[(Makeup,MakeupType)])(implicit request: Request[_])
+
+@makeupViewItems.items.map { case (makeup,_type) =>
+  <tr>
+    <td>@makeup.name</td>
+    <td>@_type.name</td>
+    <td>@makeup.rank.getOrElse("")</td>
+  </tr>
+}

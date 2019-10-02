@@ -4,10 +4,11 @@ import com.thatjessicaiknow.commonjs.repo.MakeupAjaxRepo
 import org.querki.jquery.{$, JQuery}
 import org.scalajs.dom.document
 
-import scala.concurrent.ExecutionContext
-
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
+import com.thatjessicaiknow.commonjs.views.MakeupListView
+import com.thatjessicaiknow.shared.makeup.Makeups.Makeup
 
 object MakeupFormApp {
 
@@ -16,21 +17,34 @@ object MakeupFormApp {
 
   def app(): Unit = {
   
-    def typeSelector = $(".selectpicker")
+    def $typeSelector = $(".selectpicker")
+    
+    def $makeupTable = $("#makeup-table-container")
   
     $(document).ready { () =>
-      println("Hello from jquery")
   
-      typeSelector.selectpicker()
+      $typeSelector.selectpicker()
   
-      val id = typeSelector.value()
+      renderTable()
+    }
+    
+    $typeSelector.on("change",() => {
       
-      makeupRepo.findByType("fe1dce98-ff56-473a-b171-2ce271533338").foreach(m => {
-      
-        println(m)
-      })
+      renderTable()
+    })
+    
+    def renderTable(): Unit = {
   
-      println(id)
+      val id = $typeSelector.value()
+  
+      if(id != null) {
+        makeupRepo.findByType(id.asInstanceOf[String]).foreach(makeup => {
+    
+          $makeupTable.empty()
+    
+          $makeupTable.html(MakeupListView.apply(makeup).toString())
+        })
+      }
     }
   }
   

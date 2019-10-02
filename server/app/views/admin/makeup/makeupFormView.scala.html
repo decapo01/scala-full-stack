@@ -3,7 +3,7 @@
 @import com.thatjessicaiknow.server.common.Views.{View,Create,Update,Delete}
 @import views.html.common.selectPicker
 
-@(_form: Form[Makeup],view: View,_types: Seq[(String,String)] = Seq())(implicit requestHeader: RequestHeader, messages: Messages)
+@(_form: Form[Makeup],view: View,_types: Seq[(String,String)])(implicit requestHeader: RequestHeader, messages: Messages)
 
 
 @css = {
@@ -78,5 +78,12 @@
       </div>
     </div>
 
+    <div class="row">
+      <div class="col-lg-12">
+        <div id="makeup-table-container" class="table-responsive">
+
+        </div>
+      </div>
+    </div>
   </div>
 }

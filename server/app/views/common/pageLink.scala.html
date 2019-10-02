@@ -1,20 +1,12 @@
 @(request: Request[_],page: Int)
 
+
+@*This maybe able to be moved into code level*@
 @{
-  request.getQueryString("page") match {
-    case Some(p) => {
+  (request.queryString + ("page" -> Seq(page.toString))).map {
 
-      (request.queryString + ("page" -> Seq(page.toString))).map {
+    case (k,v) => s"$k=${v.head}"
 
-        case (k,v) => s"$k=${v.head}"
-
-      }.reduce((a,b) => a + "&" + b)
-    }
-
-    case None => {
-
-      request.rawQueryString + "page=" + page
-    }
-  }
+  }.reduce((a,b) => a + "&" + b)
 }
 

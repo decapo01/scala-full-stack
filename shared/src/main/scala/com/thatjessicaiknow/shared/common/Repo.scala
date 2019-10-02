@@ -55,7 +55,7 @@ object Repo {
 
     def findByCriteria(criteria: Seq[CRITERIA]): Future[Option[ENTITY]]
 
-    def findAll(criteria: Seq[CRITERIA] = Seq()): Future[Seq[ENTITY]]
+    def findAll(criteria: Seq[CRITERIA] = Seq(), sortOpt: Option[SORT] = None): Future[Seq[ENTITY]]
 
     //def findTotal(criteria: Seq[CRITERIA] = Seq()): Future[Int]
 

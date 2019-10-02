@@ -39,8 +39,9 @@ object MakeupRepo {
       def name        = column[String]        ("name")
       def description = column[Option[String]]("description")
       def rank        = column[Option[Int]]   ("rank")
+      def link        = column[Option[String]]("link")
       
-      def * = (id,typeId,name,description,rank).mapTo[Makeup]
+      def * = (id,typeId,name,description,rank,link).mapTo[Makeup]
     }
     
     
@@ -53,6 +54,7 @@ object MakeupRepo {
         case Makeups.MakeupMakeupTypeIdEq(value) => item.typeId === value
         case Makeups.MakeupNameEq(value)         => item.name   === value
         case Makeups.Search(value)               => item.name.like(value.toLowerCase()) || item.description.like(value).getOrElse(false)
+        case Makeups.MakeupRankEq(value)         => value.map { v => item.rank.map{ i => i === v }.getOrElse(false) }.getOrElse(false)
       }
     }
     
@@ -64,8 +66,8 @@ object MakeupRepo {
         case Makeups.MakeupIdDesc => item.id.desc
         case Makeups.NameAsc      => item.name.asc
         case Makeups.NameDesc     => item.name.desc
-        case Makeups.RankAsc      => item.rank.asc
-        case Makeups.RankDesc     => item.rank.desc
+        case Makeups.RankAsc      => item.rank.asc.nullsLast
+        case Makeups.RankDesc     => item.rank.desc.nullsLast
       }
     }
   }
@@ -94,7 +96,7 @@ object MakeupRepo {
   case object NameAsc  extends MakeupViewSort
   case object NameDesc extends MakeupViewSort
   case object TypeAsc  extends MakeupViewSort
-  case object TypeDsc  extends MakeupViewSort
+  case object TypeDesc extends MakeupViewSort
   case object RankAsc  extends MakeupViewSort
   case object RankDesc extends MakeupViewSort
   case object DescriptionAsc  extends MakeupViewSort
@@ -181,7 +183,7 @@ object MakeupRepo {
         case NameAsc         => makeup.name.asc
         case NameDesc        => makeup.name.desc
         case TypeAsc         => _type.name.asc
-        case TypeDsc         => _type.name.desc
+        case TypeDesc        => _type.name.desc
         case RankAsc         => makeup.rank.asc
         case RankDesc        => makeup.rank.desc
         case DescriptionAsc  => makeup.description.asc

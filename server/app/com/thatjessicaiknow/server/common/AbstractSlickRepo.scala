@@ -43,9 +43,14 @@ with    Repo[ID,ENTITY,CRITERIA,SORT]{
   def findByCriteria(criterion: Seq[CRITERIA]): Future[Option[ENTITY]] =
       db.run(findAllQuery(criterion).result.headOption)
 
-  def findAll(criterion: Seq[CRITERIA]): Future[Seq[ENTITY]] = {
-    println(findAllQuery(criterion).result.statements)
-    db.run(findAllQuery(criterion).result)
+  def findAll(criterion: Seq[CRITERIA],sortOpt: Option[SORT] = None): Future[Seq[ENTITY]] = {
+    
+    val q = sortOpt match {
+      case None    => findAllQuery(criterion)
+      case Some(s) => findAllQuery(criterion).sortBy(i => buildSort(i,s))
+    }
+    
+    db.run(q.result)
   }
 
   def findPage(criterion: Seq[CRITERIA] = Seq(),limit: Int = 10,page: Int = 1,sort: SORT): Future[Page[ENTITY]] = {
