@@ -1,16 +1,14 @@
-@()(/*implicit req: RequestHeader,messages: Messages*/)
+@import com.thatjessicaiknow.server.actions.Authentication.LoggedInUser
+@import com.thatjessicaiknow.server.actions.Authentication.AuthUser
 
-@scripts = {
-  @* add scripts here *@
-}
+@(heading: String,loggedInUser: AuthUser, scripts: Option[Html] = None, css: Option[Html] = None)(content: Html)
 
-
-@main("Admin"){
+@main("Admin",Some(loggedInUser),scripts,css){
 
   <div class="container">
     <div class="row">
       <div class="col-lg-12">
-        <h3>Admin</h3>
+        <h3>@heading</h3>
       </div>
     </div>
     <div class="row">
@@ -23,6 +21,9 @@
             <a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.index()">Makeup</a>
           </div>
         </div>
+      </div>
+      <div class="col-lg-10">
+        @content
       </div>
     </div>
   </div>

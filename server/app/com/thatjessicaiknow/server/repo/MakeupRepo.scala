@@ -37,11 +37,12 @@ object MakeupRepo {
       def id          = column[MakeupId]      ("id",O.PrimaryKey)
       def typeId      = column[MakeupTypeId]  ("type_id")
       def name        = column[String]        ("name")
+      def slug        = column[String]        ("slug")
       def description = column[Option[String]]("description")
       def rank        = column[Option[Int]]   ("rank")
       def link        = column[Option[String]]("link")
       
-      def * = (id,typeId,name,description,rank,link).mapTo[Makeup]
+      def * = (id,typeId,name,slug,description,rank,link).mapTo[Makeup]
     }
     
     
@@ -51,6 +52,7 @@ object MakeupRepo {
   
         case Makeups.MakeupIdEq(value)           => item.id === value
         case Makeups.MakeupIdNotEq(value)        => item.id =!= value
+        case Makeups.SlugEq(value)               => item.slug === value
         case Makeups.MakeupMakeupTypeIdEq(value) => item.typeId === value
         case Makeups.MakeupNameEq(value)         => item.name   === value
         case Makeups.Search(value)               => item.name.like(value.toLowerCase()) || item.description.like(value).getOrElse(false)
@@ -105,8 +107,13 @@ object MakeupRepo {
   
   trait MakeupViewRepo {
   
+    def findBySlug(slug: String): Future[Option[(Makeup,MakeupType)]]
+  
+    def findById(makeupId: MakeupId): Future[Option[(Makeup,MakeupType)]]
+  
     def findPage(makeupCriteria     : Seq[MakeupCriteria[_]]     = Seq(),
                  makeupTypeCriteria : Seq[MakeupTypeCriteria[_]] = Seq(),
+                 searchTerm         : Option[String]             = None,
                  sort               : MakeupViewSort             = IdAsc,
                  limit              : Int                        = 10,
                  page               : Int                        = 1): Future[Page[(Makeup,MakeupType)]]
@@ -148,8 +155,23 @@ object MakeupRepo {
         (_makeup,_type)
       }
       
+    def findById(makeupId: MakeupId): Future[Option[(Makeup,MakeupType)]] = {
+    
+      val query = joinQuery.filter { case (_makeup,_) => _makeup.id === makeupId }
+      
+      db.run(query.result.headOption)
+    }
+    
+    def findBySlug(slug: String): Future[Option[(Makeup,MakeupType)]] = {
+    
+      val query = joinQuery.filter { case (_makeup,_) => _makeup.slug === slug }
+      
+      db.run(query.result.headOption)
+    }
+    
     def findPage(makeupCriteria     : Seq[MakeupCriteria[_]]     = Seq(),
                  makeupTypeCriteria : Seq[MakeupTypeCriteria[_]] = Seq(),
+                 searchTermOpt      : Option[String]             = None,
                  sort               : MakeupViewSort             = IdAsc,
                  limit              : Int                        = 10,
                  page               : Int                        = 1): Future[Page[(Makeup,MakeupType)]] = {
@@ -160,7 +182,12 @@ object MakeupRepo {
       .filter {
         case (_makeup,_type) =>
           makeupCriteria.map(c => buildQuery(_makeup,c)).reduceLeftOption(_ && _).getOrElse(LiteralColumn(true)) &&
-          makeupTypeCriteria.map(c => buildQuery(_type,c)).reduceLeftOption(_ && _).getOrElse(LiteralColumn(true))
+          makeupTypeCriteria.map(c => buildQuery(_type,c)).reduceLeftOption(_ && _).getOrElse(LiteralColumn(true)) &&
+          searchTermOpt.map { searchTerm =>
+            _makeup.name.toLowerCase.like(s"%${searchTerm.toLowerCase()}%") ||
+            _makeup.description.map(des => des.toLowerCase.like(s"%${searchTerm.toLowerCase()}%")).getOrElse(false) ||
+            _type.name.toLowerCase.like(s"%${searchTerm.toLowerCase()}%")
+          }.reduceLeftOption(_ && _).getOrElse(LiteralColumn(true))
       }
       
       val results = db.run(query.drop(1 - (limit * page)).take(limit).result)
@@ -184,10 +211,10 @@ object MakeupRepo {
         case NameDesc        => makeup.name.desc
         case TypeAsc         => _type.name.asc
         case TypeDesc        => _type.name.desc
-        case RankAsc         => makeup.rank.asc
-        case RankDesc        => makeup.rank.desc
-        case DescriptionAsc  => makeup.description.asc
-        case DescriptionDesc => makeup.description.desc
+        case RankAsc         => makeup.rank.asc.nullsLast
+        case RankDesc        => makeup.rank.desc.nullsLast
+        case DescriptionAsc  => makeup.description.asc.nullsLast
+        case DescriptionDesc => makeup.description.desc.nullsLast
       }
     }
     

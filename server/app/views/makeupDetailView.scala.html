@@ -1,0 +1,56 @@
+@import com.thatjessicaiknow.server.actions.Authentication.AuthUser
+@import com.thatjessicaiknow.shared.makeup.Makeups.{Makeup,MakeupType}
+
+
+@(loggedInUser: Option[AuthUser], makeupView: (Makeup,MakeupType), similarMakeups: Seq[Makeup])
+
+
+
+@main("That Jessica I Know - Makeup " + makeupView._1.name, loggedInUser = loggedInUser) {
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <h1>@makeupView._1.name</h1>
+        <table>
+          <tbody>
+            <tr>
+              <td><b>Rank :</b></td><td>@makeupView._1.rank.getOrElse("")</td>
+            </tr>
+            <tr>
+              <td><b>Type :</b></td><td><a href="@com.thatjessicaiknow.server.controllers.routes.Application.index(typeIdEq = Some(makeupView._2.id.value))">@makeupView._2.name</a></td>
+            </tr>
+            <tr>
+              <td><b>Link :</b></td>
+              <td>
+                @makeupView._1.link match {
+                  case Some(_link) => {<a href="@_link">@_link</a>}
+                  case None => {}
+                }
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <h2>Similar Makeup</h2>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Makeup</th>
+                <th>Rank</th>
+              </tr>
+            </thead>
+            <tbody>
+              @similarMakeups.map { similarMakeup =>
+                <tr>
+                  <td><a href="@com.thatjessicaiknow.server.controllers.routes.Application.getDetail(similarMakeup.slug)">@similarMakeup.name</a></td>
+                  <td>@similarMakeup.rank.getOrElse("")</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+}

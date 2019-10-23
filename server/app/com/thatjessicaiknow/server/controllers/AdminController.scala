@@ -13,9 +13,9 @@ class AdminController @Inject()(
   implicit ec: ExecutionContext) extends AbstractController(cc){
 
 
-  def index = (authenticationAction andThen AuthorizationAction(AdminRole)){
+  def index = (authenticationAction andThen AuthorizationAction(AdminRole)){ req =>
 
-    Ok(views.html.adminView())
+    Ok(views.html.admin.adminIndex(req.user))
   }
 
 }

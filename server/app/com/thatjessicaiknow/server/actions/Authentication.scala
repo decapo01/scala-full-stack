@@ -47,6 +47,24 @@ object Authentication {
     def hasRoles(roles: Seq[Role]) = false
   }
   
+  case class MaybeAuthReq[A](req: Request[A], maybeLoggedInUer: Option[AuthUser]) extends WrappedRequest[A](req)
+  
+  class MaybeAuthAction @Inject()(val parser: BodyParsers.Default)(implicit val executionContext: ExecutionContext) extends ActionBuilder[MaybeAuthReq,AnyContent] with ActionTransformer[Request,MaybeAuthReq] {
+  
+    override protected def transform[A](request: Request[A]): Future[MaybeAuthReq[A]] = {
+    
+      val maybeUserEmail = request.session.get(Names.email)
+      val maybeUserId    = request.session.get(Names.userId)
+      
+      (maybeUserEmail,maybeUserId) match {
+  
+        case (Some(email),Some(id)) => Future.successful(MaybeAuthReq(request,Some(LoggedInUser(UUID.fromString(id),email,Seq()))))
+        case _ => Future.successful(MaybeAuthReq(request,None))
+      }
+    }
+  }
+  
+  
   sealed trait AuthRequestAttempt[A] extends WrappedRequest[A] {
   
     val user: AuthUser

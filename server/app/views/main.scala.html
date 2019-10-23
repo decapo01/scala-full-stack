@@ -1,4 +1,7 @@
-@(title: String,extraScripts: Option[Html] = None,extraCss: Option[Html] = None)(content: Html)
+@import com.thatjessicaiknow.server.actions.Authentication.LoggedInUser
+@import com.thatjessicaiknow.server.actions.Authentication.AuthUser
+
+@(title: String,loggedInUser: Option[AuthUser] = None, extraScripts: Option[Html] = None,extraCss: Option[Html] = None)(content: Html)
 
 <!DOCTYPE html>
 
@@ -6,12 +9,46 @@
   <head>
     <title>@title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Satisfy&display=swap" rel="stylesheet">
     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css")">
     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
     @extraCss.getOrElse({})
     <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
   </head>
   <body>
+
+    <div id="banner" class="container-fluid">
+      <div class="row">
+        <div class="col-md-5 col-md-offset-5 col-lg-5 col-lg-offset-5">
+          <h1>That Jessica</h1>
+        </div>
+      </div>
+    </div>
+
+    <nav class="navbar navbar-inverse navbar-static-top">
+      <div class="container">
+
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="@com.thatjessicaiknow.server.controllers.routes.Application.index()">Makeup</a></li>
+          @*
+          <li><a href="#">Hair Care</a></li>
+          <li><a href="#">Skin Products</a></li>
+          *@
+        </ul>
+
+        @loggedInUser.map { user =>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown">@user.email<span class="caret"></span> </a>
+              <ul class="dropdown-menu">
+                <li><a href="@com.thatjessicaiknow.server.controllers.routes.AdminController.index()">Dashboard</a></li>
+                <li><a href="@com.thatjessicaiknow.server.controllers.routes.Application.getLogin()">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+        }
+      </div>
+    </nav>
 
     @content
 

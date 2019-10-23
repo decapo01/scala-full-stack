@@ -3,21 +3,23 @@ package com.thatjessicaiknow.server.controllers
 import java.util.UUID
 
 import com.thatjessicaiknow.server.actions.Authentication
+import com.thatjessicaiknow.server.actions.Authentication.{MaybeAuthAction, MaybeAuthReq}
 import com.thatjessicaiknow.server.providers.{DateTimeProvider, HashProvider, UUIDProvider}
 import com.thatjessicaiknow.shared.accounts.Accounts
 import com.thatjessicaiknow.shared.accounts.Accounts._
 import javax.inject._
 import com.thatjessicaiknow.shared.shared.SharedMessages
-import com.thatjessicaiknow.server.repo.UserRepos
+import com.thatjessicaiknow.server.repo.{MakeupRepo, UserRepos}
 import com.thatjessicaiknow.server.controllers.routes.Application
-import com.thatjessicaiknow.server.repo.MakeupRepo.MakeupViewRepo
-import com.thatjessicaiknow.shared.makeup.Makeups.MakeupTypeRepo
+import com.thatjessicaiknow.server.repo.MakeupRepo.{MakeupViewRepo, MakeupViewSort}
+import com.thatjessicaiknow.shared.makeup.Makeups.{MakeupCriteria, MakeupId, MakeupIdNotEq, MakeupMakeupTypeIdEq, MakeupRepo, MakeupTypeCriteria, MakeupTypeId, MakeupTypeIdEq, MakeupTypeRepo, RankAsc}
 import play.api.mvc._
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.I18nSupport
 import views.html.registerFormView
 import views.html.loginView
+import views.html.{makeupDetailView => detailView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,10 +34,12 @@ class Application @Inject()(userRepo         : UserRepo,
                             loginAttemptRepo : LoginAttemptRepo,
                             blockedIpRepo    : BlockedIpRepo,
                             makeupViewRepo   : MakeupViewRepo,
-                            makeupTypeRepo    : MakeupTypeRepo,
+                            makeupRepo       : MakeupRepo,
+                            makeupTypeRepo   : MakeupTypeRepo,
                             uuidProvider     : UUIDProvider,
                             dateTimeProvider : DateTimeProvider,
                             cc               : ControllerComponents,
+                            maybeAuthAction  : MaybeAuthAction,
                             hashProvider: HashProvider) (
                             implicit ec: ExecutionContext) extends AbstractController(cc)
                                                           with I18nSupport {
@@ -58,19 +62,47 @@ class Application @Inject()(userRepo         : UserRepo,
     )(LoginData.apply)(LoginData.unapply)
   )
 
-  def index() = Action.async { implicit req =>
+  def index(typeIdEq   : Option[UUID]   = None,
+            searchTerm : Option[String] = None,
+            limit      : Option[Int]    = None,
+            page       : Option[Int]    = None,
+            sort       : Option[String] = None,
+            order      : Option[String] = None) = maybeAuthAction.async { implicit req =>
   
+    val makeupTypeCriteria: Seq[MakeupTypeCriteria[_]] = Seq (
+      typeIdEq.map { typeId => MakeupTypeIdEq(MakeupTypeId(typeId)) }
+    )
+    .filter(m => m.isDefined)
+    .map { m => m.get }
+    
+    val _sort = mapToSort(sort,order)
+    
     for {
-      makeupViews <- makeupViewRepo.findPage()
+      makeupViews <- makeupViewRepo.findPage(makeupTypeCriteria = makeupTypeCriteria, searchTerm = searchTerm, limit = limit.getOrElse(100), page = page.getOrElse(1), sort = _sort)
       makeupTypes <- makeupTypeRepo.findAll()
     }
     yield {
   
-      val x = null  // compiles :-(
-  
       val user = User(UserId(UUID.randomUUID()),"email@email.com","password")
     
-      Ok(views.html.index(SharedMessages.itWorks,user,makeupViews,makeupTypes))
+      Ok(views.html.index(SharedMessages.itWorks,req.maybeLoggedInUer,makeupViews,makeupTypes))
+    }
+  }
+  
+  def getDetail(slug: String) = maybeAuthAction.async { implicit req =>
+    
+    for {
+      maybeMakeupView <- makeupViewRepo.findBySlug(slug)
+      similarMakeups  <- maybeMakeupView match {
+        case None => Future.successful(Seq())
+        case Some((makeup,_type)) => makeupRepo.findAll(criteria = Seq(MakeupMakeupTypeIdEq(_type.id),MakeupIdNotEq(makeup.id)), sortOpt = Some(RankAsc))
+      }
+    }
+    yield {
+      maybeMakeupView match {
+        case None => NotFound("Not found")
+        case Some(makeupView) => Ok(detailView(req.maybeLoggedInUer,makeupView,similarMakeups))
+      }
     }
   }
 
@@ -222,6 +254,19 @@ class Application @Inject()(userRepo         : UserRepo,
       case UserRole  => "user"
       case GuestRole => "guest"
       case AdminRole => "admin"
+    }
+  }
+  
+  def mapToSort(sortOpt: Option[String], orderOpt: Option[String]): MakeupViewSort = {
+  
+    (sortOpt,orderOpt) match {
+      case (Some(sortStr),Some(orderStr)) if sortStr == "name" && orderStr == "asc" => MakeupRepo.NameAsc
+      case (Some(sortStr),Some(orderStr)) if sortStr == "name" && orderStr == "desc" => MakeupRepo.NameDesc
+      case (Some(sortStr),Some(orderStr)) if sortStr == "type" && orderStr == "asc" => MakeupRepo.TypeAsc
+      case (Some(sortStr),Some(orderStr)) if sortStr == "type" && orderStr == "desc" => MakeupRepo.TypeDesc
+      case (Some(sortStr),Some(orderStr)) if sortStr == "rank" && orderStr == "asc" => MakeupRepo.RankAsc
+      case (Some(sortStr),Some(orderStr)) if sortStr == "rank" && orderStr == "desc" => MakeupRepo.RankDesc
+      case _ => MakeupRepo.IdAsc
     }
   }
 }

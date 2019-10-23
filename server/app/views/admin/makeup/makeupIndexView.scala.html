@@ -3,79 +3,72 @@
 @import com.thatjessicaiknow.server.common.SortBy
 @import views.html.common.sortIcon
 @import views.html.common.pageLink
+@import views.html.admin.adminLayout
+@import com.thatjessicaiknow.server.actions.Authentication.LoggedInUser
+@import com.thatjessicaiknow.server.actions.Authentication.AuthUser
 
-@(_page: Page[(Makeup,MakeupType)])(implicit req: Request[_],flash: Flash)
+@(loggedInUser: AuthUser,_page: Page[(Makeup,MakeupType)])(implicit req: Request[_],flash: Flash)
 
-@main("Makeup"){
+@adminLayout("Makeup",loggedInUser){
 
-  <div class="container-fluid">
-
+  @flash.get("msg").map { msg =>
     <div class="row">
       <div class="col-lg-12">
-        <h1>Makeup</h1>
-      </div>
-    </div>
-
-    @flash.get("msg").map { msg =>
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="alert alert-success">
-            @msg
-          </div>
+        <div class="alert alert-success">
+          @msg
         </div>
       </div>
-    }
-
-    <div class="row">
-      <div class="col-lg-12">
-        <a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.getCreate()">Create New</a>
-      </div>
     </div>
+  }
 
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="table-responsive">
-          <table class="table table-bordered">
-            <thead>
+  <div class="row">
+    <div class="col-lg-12">
+      <a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.getCreate()">Create New</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th><a href="?@SortBy(req,"name")">       Name @sortIcon(req,"name") </a></th>
+              <th><a href="?@SortBy(req,"type")">       Type @sortIcon(req,"type") </a></th>
+              <th><a href="?@SortBy(req,"description")">Description @sortIcon(req,"description")</a></th>
+              <th><a href="?@SortBy(req,"rank")">       Rank @sortIcon(req,"rank") </a></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @_page.items.map { case (makeup, _type) =>
               <tr>
-                <th><a href="?@SortBy(req,"name")">       Name @sortIcon(req,"name") </a></th>
-                <th><a href="?@SortBy(req,"type")">       Type @sortIcon(req,"type") </a></th>
-                <th><a href="?@SortBy(req,"description")">Description @sortIcon(req,"description")</a></th>
-                <th><a href="?@SortBy(req,"rank")">       Rank @sortIcon(req,"rank") </a></th>
-                <th></th>
-                <th></th>
+                <td>@makeup.name</td>
+                <td>@_type.name</td>
+                <td>@makeup.description.getOrElse("")</td>
+                <td>@makeup.rank.getOrElse("")</td>
+                <td><a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.getUpdate(makeup.id.value)">Update</a></td>
+                <td><a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.getDelete(makeup.id.value)">Delete</a></td>
               </tr>
-            </thead>
-            <tbody>
-              @_page.items.map { case (makeup, _type) =>
-                <tr>
-                  <td>@makeup.name</td>
-                  <td>@_type.name</td>
-                  <td>@makeup.description.getOrElse("")</td>
-                  <td>@makeup.rank.getOrElse("")</td>
-                  <td><a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.getUpdate(makeup.id.value)">Update</a></td>
-                  <td><a href="@com.thatjessicaiknow.server.controllers.admin.routes.AdminMakeupController.getDelete(makeup.id.value)">Delete</a></td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+            }
+          </tbody>
+        </table>
       </div>
     </div>
+  </div>
 
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="pull-right">
-          <ul class="pagination">
-            <li><a href="?@pageLink(req,1)">first</a></li>
-            <li><a href="?@pageLink(req,_page.previousPage)">prev</a></li>
-            <li class="disabled"><a>@_page.page</a></li>
-            <li><a href="?@pageLink(req,_page.nextPage)">next</a></li>
-            <li><a href="?@pageLink(req,_page.totalPages)">last</a></li>
-          </ul>
-        </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="pull-right">
+        <ul class="pagination">
+          <li><a href="?@pageLink(req,1)">first</a></li>
+          <li><a href="?@pageLink(req,_page.previousPage)">prev</a></li>
+          <li class="disabled"><a>@_page.page</a></li>
+          <li><a href="?@pageLink(req,_page.nextPage)">next</a></li>
+          <li><a href="?@pageLink(req,_page.totalPages)">last</a></li>
+        </ul>
       </div>
     </div>
-
   </div>
 }

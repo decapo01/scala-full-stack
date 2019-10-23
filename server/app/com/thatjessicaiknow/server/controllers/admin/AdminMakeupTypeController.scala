@@ -58,7 +58,7 @@ class AdminMakeupTypeController @Inject()(
       makeupTypePage <- makeupTypeRepo.findPage(sort = _sort, page = _page)
     }
     yield {
-      Ok(indexView(makeupTypePage))
+      Ok(indexView(req.user,makeupTypePage))
     }
   }
   
@@ -71,14 +71,14 @@ class AdminMakeupTypeController @Inject()(
 
     val makeupType = MakeupType(makeupTypeId,"")
     
-    Ok(formView(form.fill(makeupType),createRoute))
+    Ok(formView(req.user,form.fill(makeupType),createRoute))
   }
   
   def postCreate = (authenticationAction andThen AuthorizationAction(AdminRole)).async { implicit req =>
     
     form.bindFromRequest().fold(
       formWithErrors => {
-        Future.successful(BadRequest(formView(formWithErrors,createRoute)))
+        Future.successful(BadRequest(formView(req.user,formWithErrors,createRoute)))
       },
       makeupType => {
         
@@ -89,6 +89,7 @@ class AdminMakeupTypeController @Inject()(
             case Some(m) => Future.successful {
               BadRequest {
                 formView (
+                  req.user,
                   form.fill(makeupType).withGlobalError("Makeup Type name exists.  Please choose a unique name."),
                   createRoute
                 )
@@ -114,7 +115,7 @@ class AdminMakeupTypeController @Inject()(
     yield {
       makeupTypeOpt match {
         case None => NotFound("Not Found")
-        case Some(m) => Ok(formView(form.fill(m),updateRoute(id)))
+        case Some(m) => Ok(formView(req.user,form.fill(m),updateRoute(id)))
       }
     }
   }
@@ -123,7 +124,7 @@ class AdminMakeupTypeController @Inject()(
     form.bindFromRequest().fold(
     
       formWithErrors => {
-        Future.successful(BadRequest(formView(formWithErrors,updateRoute(id))))
+        Future.successful(BadRequest(formView(req.user,formWithErrors,updateRoute(id))))
       },
       makeupType => {
         for {
@@ -134,6 +135,7 @@ class AdminMakeupTypeController @Inject()(
             case (_,Some(duplicate)) => Future.successful(
               BadRequest(
                 formView(
+                  req.user,
                   form.fill(makeupType).withGlobalError("Makeup Type name exists.  Please choose a unique name."),
                   updateRoute(id)
                 )
@@ -161,7 +163,7 @@ class AdminMakeupTypeController @Inject()(
         case None =>
           NotFound("Not Found")
         case Some(_type) =>
-          Ok(formView(form.fill(_type).withGlobalError("Are you sure you want to delete this?"),deleteRoute(id)))
+          Ok(formView(req.user,form.fill(_type).withGlobalError("Are you sure you want to delete this?"),deleteRoute(id)))
       }
     }
   }

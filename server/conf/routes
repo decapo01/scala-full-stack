@@ -3,7 +3,9 @@
 # ~~~~
 
 # Home page
-GET   /         com.thatjessicaiknow.server.controllers.Application.index
+GET   /                com.thatjessicaiknow.server.controllers.Application.index(typeIdEq: Option[java.util.UUID] ?= None,searchTerm: Option[String] ?= None, limit: Option[Int] ?= None, page: Option[Int] ?= None, sort: Option[String] ?= None, order: Option[String] ?= None)
+GET   /makeup/:slug    com.thatjessicaiknow.server.controllers.Application.getDetail(slug: String)
+
 
 GET   /register com.thatjessicaiknow.server.controllers.Application.getRegister
 POST  /register com.thatjessicaiknow.server.controllers.Application.postRegister

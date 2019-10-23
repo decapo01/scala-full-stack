@@ -1,42 +1,36 @@
 @import com.thatjessicaiknow.shared.makeup.Makeups.MakeupType
 @import helper._
 
-@(_form: Form[MakeupType],_action: Call)(implicit requestHeader: RequestHeader, messages: Messages)
+@import com.thatjessicaiknow.server.actions.Authentication.AuthUser
+
+@(authUser: AuthUser,_form: Form[MakeupType],_action: Call)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @implicitFieldConstructor = @{ b3.inline.fieldConstructor()}
 
-@main("Makeup Type"){
+@adminLayout("Makeup Type",authUser){
 
-  <div class="container-fluid">
+  @_form.globalErrors.map { e =>
     <div class="row">
       <div class="col-lg-12">
-        <h1>Makeup Type</h1>
-      </div>
-    </div>
-
-    @_form.globalErrors.map { e =>
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="alert alert-danger">
-            @e.message
-          </div>
+        <div class="alert alert-danger">
+          @e.message
         </div>
       </div>
-    }
+    </div>
+  }
 
-    <div class="row">
-      <div class="col-lg-12">
-        @b3.vertical.form(action = _action){ implicit vfc =>
+  <div class="row">
+    <div class="col-lg-12">
+      @b3.vertical.form(action = _action){ implicit vfc =>
 
-          @CSRF.formField
+        @CSRF.formField
 
-          @b3.hidden(_form("id.value"))
+        @b3.hidden(_form("id.value"))
 
-          @b3.text(_form("name"),'placeholder -> "name")
+        @b3.text(_form("name"),'placeholder -> "name")
 
-          @b3.submit('class -> "btn btn-default"){ Submit }
-        }
-      </div>
+        @b3.submit('class -> "btn btn-default"){ Submit }
+      }
     </div>
   </div>
 }

@@ -54,6 +54,7 @@ object Makeups {
     id          : MakeupId,
     typeId      : MakeupTypeId,
     name        : String,
+    slug        : String,
     description : Option[String],
     rank        : Option[Int],
     link        : Option[String]
@@ -65,6 +66,7 @@ object Makeups {
   
   final case class MakeupIdEq(value: MakeupId)    extends MakeupCriteria[MakeupId]
   final case class MakeupIdNotEq(value: MakeupId) extends MakeupCriteria[MakeupId]
+  final case class SlugEq(value: String)          extends MakeupCriteria[String]
   final case class MakeupNameEq(value: String)    extends MakeupCriteria[String]
   final case class MakeupMakeupTypeIdEq(value: MakeupTypeId) extends MakeupCriteria[MakeupTypeId]
   final case class Search(value: String)            extends MakeupCriteria[String]

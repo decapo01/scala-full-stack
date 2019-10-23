@@ -60,6 +60,7 @@ create table makeups (
   id      uuid primary key not null,
   type_id uuid references makeup_types(id),
   name        varchar(255) not null,
+  slug        varchar(255) not null,
   description varchar(255)     null,
   rank        int              null,
   link        varchar(255)     null

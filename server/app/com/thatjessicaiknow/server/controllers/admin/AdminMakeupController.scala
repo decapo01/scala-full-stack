@@ -18,6 +18,7 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 
 import scala.concurrent.{ExecutionContext, Future}
 import views.html.admin.makeup.{makeupFormView => formView, makeupIndexView => indexView}
+import views.html.defaultpages.error
 
 class AdminMakeupController @Inject()(
   makeupRepo: MakeupRepo,
@@ -40,6 +41,7 @@ class AdminMakeupController @Inject()(
         "value" -> uuid
       )(MakeupTypeId.apply)(MakeupTypeId.unapply),
       "name"        -> nonEmptyText,
+      "slug"        -> nonEmptyText,
       "description" -> optional(text),
       "rank"        -> optional(number(min=1)),
       "link"        -> optional(text(maxLength = 255))
@@ -71,7 +73,7 @@ class AdminMakeupController @Inject()(
       viewItems <- makeupViewRepo.findPage(sort = _sort)
     }
     yield {
-      Ok(indexView(viewItems))
+      Ok(indexView(req.user,viewItems))
     }
   }
   
@@ -85,7 +87,7 @@ class AdminMakeupController @Inject()(
     
       val types = makeupTypes.map(t => (t.id.value.toString,t.name))
       
-      Ok(formView(form.fill(defaultMakeup),Create(postCreateRoute),types))
+      Ok(formView(req.user,form.fill(defaultMakeup),Create(postCreateRoute),types))
     }
   }
   
@@ -99,7 +101,7 @@ class AdminMakeupController @Inject()(
         yield {
           val types = makeupTypes.map(t => (t.id.value.toString,t.name))
   
-          BadRequest(formView(formWithErrors,Create(getCreateRoute),types))
+          BadRequest(formView(req.user,formWithErrors,Create(getCreateRoute),types))
         }
       },
       makeup => {
@@ -116,7 +118,7 @@ class AdminMakeupController @Inject()(
                 yield {
                   val types = makeupTypes.map(t => (t.id.value.toString,t.name))
                   
-                  BadRequest(formView(_form,Create(getCreateRoute),types))
+                  BadRequest(formView(req.user,_form,Create(getCreateRoute),types))
                 }
               case None =>
                 makeupRepo.insert(makeup).map { _ => Redirect(indexRoute) }
@@ -141,7 +143,7 @@ class AdminMakeupController @Inject()(
         case Some(makeup) =>
           val _form = form.fill(makeup)
           val _types = makeupTypes.map { t => (t.id.value.toString,t.name)}
-          Ok(formView(_form,Update(postUpdateRoute(id)),_types))
+          Ok(formView(req.user,_form,Update(postUpdateRoute(id)),_types))
       }
     }
   }
@@ -155,7 +157,7 @@ class AdminMakeupController @Inject()(
         }
         yield {
           val _types = makeupTypes.map { t => (t.id.value.toString,t.name)}
-          BadRequest(formView(errors,Update(postUpdateRoute(id)),_types))
+          BadRequest(formView(req.user,errors,Update(postUpdateRoute(id)),_types))
         }
       },
       makeup => {
@@ -171,7 +173,7 @@ class AdminMakeupController @Inject()(
                 yield {
                   val _types = makeupTypes.map { t => (t.id.value.toString,t.name)}
                   val _form  = form.fill(makeup).withGlobalError("Makeup with this name currently exists")
-                  BadRequest(formView(_form,Update(postUpdateRoute(id)),_types))
+                  BadRequest(formView(req.user,_form,Update(postUpdateRoute(id)),_types))
                 }
               case _ =>
                 makeupRepo.update(makeup).map { _ => Redirect(indexRoute).flashing("msg" -> "Makeup Updated")}
@@ -197,7 +199,7 @@ class AdminMakeupController @Inject()(
           val _types = types.map { t => (t.id.value.toString,t.name)}
           val _form  = form.fill(m)
           
-          Ok(formView(_form,Delete(postDeleteRoute(id)),_types))
+          Ok(formView(req.user,_form,Delete(postDeleteRoute(id)),_types))
       }
     }
   }
@@ -219,6 +221,7 @@ class AdminMakeupController @Inject()(
       id = MakeupId(UUIDProvider.randomUUID),
       typeId = defaultMakeupTypeId,
       name = "",
+      slug = "",
       description = None,
       rank = None,
       link = None
