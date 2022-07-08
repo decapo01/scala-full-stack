@@ -17,23 +17,19 @@ import scala.concurrent.{ExecutionContext, Future}
 object MakeupRepo {
   
   trait MakeupComponent { self: HasDatabaseConfigProvider[JdbcProfile] =>
-  
     import profile.api._
     
     implicit lazy val makeupIdMapper = MappedColumnType.base[MakeupId,UUID](
-      
       makeupId => makeupId.value,
       uuid     => MakeupId(uuid)
     )
     
     implicit lazy val typeIdMapper = MappedColumnType.base[MakeupTypeId,UUID](
-    
       mId => mId.value,
       uuid => MakeupTypeId(uuid)
     )
     
     class MakeupTable(tag: Tag) extends Table[Makeup](tag,"makeups"){
-    
       def id          = column[MakeupId]      ("id",O.PrimaryKey)
       def typeId      = column[MakeupTypeId]  ("type_id")
       def name        = column[String]        ("name")
@@ -45,11 +41,8 @@ object MakeupRepo {
       def * = (id,typeId,name,slug,description,rank,link).mapTo[Makeup]
     }
     
-    
     implicit def buildQuery(item: MakeupTable,criteria: MakeupCriteria[_]): Rep[Boolean] = {
-    
       criteria match {
-  
         case Makeups.MakeupIdEq(value)           => item.id === value
         case Makeups.MakeupIdNotEq(value)        => item.id =!= value
         case Makeups.SlugEq(value)               => item.slug === value
@@ -61,9 +54,7 @@ object MakeupRepo {
     }
     
     def buildSort(item: MakeupTable, sort: MakeupSort): slick.lifted.Ordered = {
-    
       sort match {
-  
         case Makeups.MakeupIdAsc  => item.id.asc
         case Makeups.MakeupIdDesc => item.id.desc
         case Makeups.NameAsc      => item.name.asc
@@ -108,9 +99,7 @@ object MakeupRepo {
   trait MakeupViewRepo {
   
     def findBySlug(slug: String): Future[Option[(Makeup,MakeupType)]]
-  
     def findById(makeupId: MakeupId): Future[Option[(Makeup,MakeupType)]]
-  
     def findPage(makeupCriteria     : Seq[MakeupCriteria[_]]     = Seq(),
                  makeupTypeCriteria : Seq[MakeupTypeCriteria[_]] = Seq(),
                  searchTerm         : Option[String]             = None,
@@ -129,19 +118,15 @@ object MakeupRepo {
     import profile.api._
     
     import slick.lifted.TableQuery
-    
     val makeupTypes = TableQuery[MakeupTypeTable]
-    
     val makeup = TableQuery[MakeupTable]
   
     override implicit lazy val makeupIdMapper = MappedColumnType.base[MakeupId,UUID](
-    
       makeupId => makeupId.value,
       uuid     => MakeupId(uuid)
     )
   
     override implicit lazy val typeIdMapper = MappedColumnType.base[MakeupTypeId,UUID](
-    
       mId => mId.value,
       uuid => MakeupTypeId(uuid)
     )
@@ -156,16 +141,12 @@ object MakeupRepo {
       }
       
     def findById(makeupId: MakeupId): Future[Option[(Makeup,MakeupType)]] = {
-    
       val query = joinQuery.filter { case (_makeup,_) => _makeup.id === makeupId }
-      
       db.run(query.result.headOption)
     }
     
     def findBySlug(slug: String): Future[Option[(Makeup,MakeupType)]] = {
-    
       val query = joinQuery.filter { case (_makeup,_) => _makeup.slug === slug }
-      
       db.run(query.result.headOption)
     }
     
@@ -203,7 +184,6 @@ object MakeupRepo {
     }
       
     def buildSort(makeup: MakeupTable, _type: MakeupTypeTable, sort: MakeupViewSort): slick.lifted.Ordered = {
-    
       sort match {
         case IdAsc           => makeup.id.asc
         case IdDesc          => makeup.id.desc
